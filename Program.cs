@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using IncidentLink.Models;
 using IncidentLink.Data;
+using IncidentLink.Services;
+using IncidentLink.Hubs;
 
 
 
@@ -8,8 +10,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IDispatchService, DispatchService>();
+
+builder.Services.AddSignalR();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -31,6 +39,8 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
+
+app.MapHub<DispatchHub>("/dispatchHub");
 
 
 app.Run();

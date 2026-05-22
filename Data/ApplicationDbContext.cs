@@ -9,5 +9,7 @@ namespace IncidentLink.Data
             : base(options) { }
         public DbSet<Incident> Incidents { get; set; }
         public DbSet<Resource> Resources { get; set; }
+        public DbSet<AssignmentLog> AssignmentLogs { get; set; }
+
     }
 }
