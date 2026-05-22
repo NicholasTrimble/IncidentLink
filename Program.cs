@@ -43,4 +43,30 @@ app.MapControllerRoute(
 app.MapHub<DispatchHub>("/dispatchHub");
 
 
+
+
+
+// ---- AUTOMATED DATABASE SEEDING ENGINE ----
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        IncidentLink.Models.DbInitializer.Initialize(context);
+    }
+    catch (Exception ex)
+    {
+        // If anything goes wrong on startup, catch it safely
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while seeding the database operational data.");
+    }
+}
+// -------------------------------------------
+
+
+
+
+
+
 app.Run();
