@@ -1,3 +1,5 @@
+[!Alt Text](images/incidentlink.png)
+
 IncidentLink
 
 Emergency dispatch coordination system for tracking incidents and assigning response resources in real time.
