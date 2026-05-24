@@ -1,4 +1,4 @@
-[!Alt Text](images/incidentlink.png)
+![incidentlink](images/incidentlink.png)
 
 IncidentLink
 
