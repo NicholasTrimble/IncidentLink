@@ -1,5 +1,5 @@
 /* ==========================================================================
-   🚨 TACTICAL CONTROL PANEL: EDIT YOUR APP COLORS HERE
+   🚨 TACTICAL CONTROL PANEL
    ========================================================================== */
 :root {
     /* Main Layout Framework */
@@ -67,7 +67,7 @@ div.text-muted {
 }
 
 /* ==========================================================================
-   COMPLETELY OVERHAULED TABLE RULES (No More White Box/Gray Hiding)
+   COMPLETELY OVERHAULED TABLE RULES
    ========================================================================== */
 
 .tac-table {
