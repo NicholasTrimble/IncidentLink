@@ -4,7 +4,7 @@ using IncidentLink.Data;
 using IncidentLink.Services;
 using IncidentLink.Hubs;
 
-
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);
 
