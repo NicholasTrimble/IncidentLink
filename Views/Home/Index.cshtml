@@ -1,73 +1,72 @@
 ﻿@model IncidentLink.Models.DashboardViewModel
 @{
-    ViewData["Title"] = "Tactical Command Center";
+    ViewData["Title"] = "Dashboard";
 }
 
 <div class="container-fluid px-4 mt-4">
-    <!-- Real-Time System Status Header Banner -->
+    <!-- Dashboard Header -->
     <div class="row align-items-center mb-4 g-3">
         <div class="col-md-6 text-start">
-            <h4 class="mb-1 fw-bold text-white tracking-tight">INCIDENTLINK OPERATIONAL TELEMETRY</h4>
+            <h4 class="mb-1 fw-bold text-white tracking-tight">IncidentLink Dashboard</h4>
             <div class="d-flex align-items-center gap-2 small text-muted">
                 <span class="pulse-indicator"></span>
-                <span>SIGNALR LINK ESTABLISHED</span>
+                <span>Live Sync Connected</span>
                 <span class="text-secondary">|</span>
-                <span id="sync-time">SYSTEM STATUS: NOMINAL</span>
+                <span id="sync-time">System Status: Ready</span>
             </div>
         </div>
         <div class="col-md-6">
             <div class="d-flex justify-content-md-end gap-3">
                 <div class="px-3 py-2 tac-card text-center min-w-120">
-                    <div class="text-uppercase font-monospace text-muted" style="font-size: 0.65rem;">ACTIVE CRISES</div>
+                    <div class="text-uppercase font-monospace text-muted" style="font-size: 0.65rem;">Active Incidents</div>
                     <span class="h4 fw-bold mb-0 text-warning">@Model.ActiveIncidents.Count</span>
                 </div>
                 <div class="px-3 py-2 tac-card text-center min-w-120">
-                    <div class="text-uppercase font-monospace text-muted" style="font-size: 0.65rem;">UNITS IN RESERVE</div>
+                    <div class="text-uppercase font-monospace text-muted" style="font-size: 0.65rem;">Available Units</div>
                     <span class="h4 fw-bold mb-0 text-success">@Model.AvailableResources.Count</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Main Command Dashboard Workspace -->
+    <!-- Main Workspace Grid -->
     <div class="row g-4">
-        <!-- Live Incident Routing Logs -->
+        <!-- Active Incidents Table -->
         <div class="col-lg-8">
             <div class="card tac-card h-100">
                 <div class="tac-header d-flex justify-content-between align-items-center">
-                    <span>⚠️ PRIORITY CRISIS MATRIX</span>
-                    <span class="badge bg-dark font-monospace text-secondary">SECURE NODE</span>
+                    <span>🚨 Active Incidents</span>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table tac-table align-middle">
                             <thead>
                                 <tr>
-                                    <th>Incident Profile</th>
-                                    <th>Deployment Grid</th>
-                                    <th>Threat Metric</th>
-                                    <th>Status Flag</th>
+                                    <th>Emergency</th>
+                                    <th>Location</th>
+                                    <th>Severity</th>
+                                    <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @if (!Model.ActiveIncidents.Any())
                                 {
                                     <tr>
-                                        <td colspan="4" class="text-center text-muted py-5 font-monospace small">NO PENDING CRISES ENCOUNTERED</td>
+                                        <td colspan="4" class="text-center text-muted py-5 small">No active incidents found.</td>
                                     </tr>
                                 }
                                 @foreach (var item in Model.ActiveIncidents)
                                 {
                                     <tr>
                                         <td><span class="fw-bold text-white">@item.Title</span></td>
-                                        <td><span class="font-monospace text-secondary">@item.Location</span></td>
+                                        <td><span class="text-secondary">@item.Location</span></td>
                                         <td>
-                                            <span class="badge font-monospace @(item.Severity.ToString() == "Critical" || item.Severity.ToString() == "High" ? "badge-neon-danger" : "badge-neon-warning")">
+                                            <span class="badge @(item.Severity.ToString() == "Critical" || item.Severity.ToString() == "High" ? "badge-neon-danger" : "badge-neon-warning")">
                                                 @item.Severity
                                             </span>
                                         </td>
                                         <td>
-                                            <span class="badge rounded-pill font-monospace text-uppercase @(item.Status.ToString() == "Assigned" ? "badge-neon-info" : "badge-neon-warning")">
+                                            <span class="badge rounded-pill text-uppercase @(item.Status.ToString() == "Assigned" ? "badge-neon-info" : "badge-neon-warning")">
                                                 @item.Status
                                             </span>
                                         </td>
@@ -80,50 +79,50 @@
             </div>
         </div>
 
-        <!-- Right System Resource Column -->
+        <!-- Right Side Columns -->
         <div class="col-lg-4">
             <div class="row g-4">
-                <!-- Fleet Management Sub-panel -->
+                <!-- Fleet Status Panel -->
                 <div class="col-12">
                     <div class="card tac-card">
-                        <div class="tac-header font-monospace">🚒 FIELD FLEET READINESS</div>
+                        <div class="tac-header">🚒 Available Fleet Status</div>
                         <div class="list-group list-group-flush" style="max-height: 280px; overflow-y: auto;">
                             @if (!Model.AvailableResources.Any())
                             {
-                                <div class="p-4 text-center text-muted font-monospace small">ALL UNITS CURRENTLY DISPATCHED</div>
+                                <div class="p-4 text-center text-muted small">All units are currently dispatched.</div>
                             }
                             @foreach (var res in Model.AvailableResources)
                             {
                                 <div class="list-group-item bg-transparent d-flex justify-content-between align-items-center py-3 border-secondary border-opacity-10">
                                     <div>
                                         <div class="fw-bold text-white mb-0" style="font-size: 0.9rem;">@res.Name</div>
-                                        <small class="text-muted font-monospace text-uppercase" style="font-size: 0.7rem;">@res.Type</small>
+                                        <small class="text-muted text-uppercase" style="font-size: 0.7rem;">@res.Type</small>
                                     </div>
-                                    <span class="badge badge-neon-success font-monospace small">STANDBY</span>
+                                    <span class="badge badge-neon-success small">Available</span>
                                 </div>
                             }
                         </div>
                     </div>
                 </div>
 
-                <!-- Live Audit Logs Sub-panel -->
+                <!-- Recent Dispatch Logs Panel -->
                 <div class="col-12">
                     <div class="card tac-card">
-                        <div class="tac-header font-monospace">📋 SYSTEM HISTORICAL TELEMETRY</div>
-                        <div class="list-group list-group-flush font-monospace" style="font-size: 0.8rem;">
+                        <div class="tac-header">📋 Recent Activity Log</div>
+                        <div class="list-group list-group-flush" style="font-size: 0.85rem;">
                             @if (!Model.RecentAssignments.Any())
                             {
-                                <div class="p-4 text-center text-muted small">NO TRANSACTION LOGS RECORDED</div>
+                                <div class="p-4 text-center text-muted small">No recent dispatch activity recorded.</div>
                             }
                             @foreach (var log in Model.RecentAssignments)
                             {
                                 <div class="list-group-item bg-transparent py-3 border-secondary border-opacity-10">
-                                    <div class="d-flex justify-content-between text-muted mb-1" style="font-size: 0.7rem;">
-                                        <span class="text-info">▲ LOG_ALPHA_TRANS</span>
+                                    <div class="d-flex justify-content-between text-muted mb-1" style="font-size: 0.75rem;">
+                                        <span class="text-info">Dispatch Action</span>
                                         <span>@log.AssignedAt.ToShortTimeString()</span>
                                     </div>
                                     <div class="text-white-50">
-                                        Unit <span class="text-success fw-bold">@log.Resource?.Name</span> mapped securely to <span class="text-warning">@log.Incident?.Title</span>
+                                        Unit <span class="text-success fw-bold">@log.Resource?.Name</span> was dispatched to <span class="text-warning">@log.Incident?.Title</span>
                                     </div>
                                 </div>
                             }
@@ -144,7 +143,7 @@
         .build();
 
         connection.on("UpdateDashboard", function () {
-        document.getElementById("sync-time").innerText = "SYNCING RECENT DATA CHANGES...";
+        document.getElementById("sync-time").innerText = "Updating dashboard data...";
         window.location.reload();
         });
 
