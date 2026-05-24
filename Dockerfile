@@ -5,14 +5,14 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build-env
 WORKDIR /app
 
 # 1. Copy the project file first to restore dependencies
-COPY IncidentLink/*.csproj ./IncidentLink/
-RUN dotnet restore IncidentLink/*.csproj
+COPY *.csproj ./
+RUN dotnet restore *.csproj
 
 # 2. Copy the rest of your source code
 COPY . .
 
 # 3. Publish a compiled, optimized release of the app
-RUN dotnet publish IncidentLink/IncidentLink.csproj -c Release -o out
+RUN dotnet publish -c Release -o out
 
 # ==========================================
 # STAGE 2: Create the lightweight runtime container
