@@ -22,11 +22,10 @@
         </div>
 
         <div>
-            <label class="text-sm text-gray-400">Status</label>
-
-            <select asp-for="Status"
+            <label class="text-sm text-gray-400">Severity</label>
+            <select asp-for="Severity"
                     class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-white"
-                    asp-items="Html.GetEnumSelectList<IncidentLink.Models.IncidentStatus>()">
+                    asp-items="Html.GetEnumSelectList<IncidentLink.Models.IncidentSeverity>()">
             </select>
         </div>
 
