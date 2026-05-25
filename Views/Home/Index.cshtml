@@ -1,208 +1,153 @@
 ﻿@model IncidentLink.Models.DashboardViewModel
 @{
-    ViewData["Title"] = "Dashboard";
+    ViewData["Title"] = "Command Center";
 }
 
-<div class="space-y-8">
+<div class="space-y-10">
 
-    <!-- ===================== -->
-    <!-- HERO STATUS BAR -->
-    <!-- ===================== -->
-    <div class="rounded-2xl border border-white/10 bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 p-6">
-
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-
-            <div>
-                <h1 class="text-2xl font-semibold text-white tracking-tight">
-                    Incident Command Dashboard
-                </h1>
-
-                <p class="text-sm text-gray-400 mt-2">
-                    Real-time monitoring & dispatch control system
-                </p>
-
-                <div class="flex items-center gap-3 mt-3 text-xs text-gray-400">
-                    <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    System Online
-                    <span class="text-gray-600">•</span>
-                    Last sync: <span id="sync-time">live</span>
-                </div>
+    <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-slate-900 pb-6 gap-4">
+        <div>
+            <div class="text-[10px] font-bold uppercase tracking-[0.25em] text-red-500 mb-2 flex items-center gap-2">
+                <span class="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                Emergency Response Environment // System 2026
             </div>
-
-            <!-- QUICK ACTIONS -->
-            <div class="flex gap-3">
-                <a asp-controller="Dispatch" asp-action="Create"
-                       class="px-4 py-2 rounded-xl bg-red-500/10 text-red-300 border border-red-500/20 hover:bg-red-500/20 transition">
-                    Dispatch Unit
-                </a>
-
-                <a asp-controller="Incidents" asp-action="Create"
-                       class="px-4 py-2 rounded-xl bg-white/5 text-white border border-white/10 hover:bg-white/10 transition">
-                    New Incident
-                </a>
-            </div>
-
+            <h1 class="text-3xl lg:text-4xl font-extrabold tracking-tight text-white">
+                Incident Command <span class="text-slate-500 font-light">Center</span>
+            </h1>
+        </div>
+        
+        <div class="text-xs font-mono text-slate-400 bg-slate-900/40 border border-slate-800/60 px-4 py-2 rounded-xl flex items-center gap-3">
+            <span class="text-emerald-400">● COMMS OK</span>
+            <span class="text-slate-700">|</span>
+            <span>SYNC: <span id="sync-time" class="text-cyan-400">LIVE</span></span>
         </div>
     </div>
 
-    <!-- ===================== -->
-    <!-- KPI CARDS -->
-    <!-- ===================== -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-
-        <div class="rounded-2xl bg-white/5 border border-white/10 p-5">
-            <div class="text-xs text-gray-400 uppercase">Active Incidents</div>
-            <div class="text-3xl font-semibold text-amber-300 mt-2">
-                @Model.ActiveIncidents.Count
-            </div>
-        </div>
-
-        <div class="rounded-2xl bg-white/5 border border-white/10 p-5">
-            <div class="text-xs text-gray-400 uppercase">Available Units</div>
-            <div class="text-3xl font-semibold text-emerald-300 mt-2">
-                @Model.AvailableResources.Count
-            </div>
-        </div>
-
-        <div class="rounded-2xl bg-white/5 border border-white/10 p-5">
-            <div class="text-xs text-gray-400 uppercase">Critical Alerts</div>
-            <div class="text-3xl font-semibold text-red-300 mt-2">
-                @Model.ActiveIncidents.Count(i => i.Severity.ToString() == "Critical")
-            </div>
-        </div>
-
-        <div class="rounded-2xl bg-white/5 border border-white/10 p-5">
-            <div class="text-xs text-gray-400 uppercase">System Status</div>
-            <div class="text-lg font-semibold text-cyan-300 mt-2">
-                Operational
-            </div>
-        </div>
-
-    </div>
-
-    <!-- ===================== -->
-    <!-- MAIN GRID -->
-    <!-- ===================== -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-        <!-- LEFT: INCIDENTS (CARD FEED INSTEAD OF TABLE) -->
-        <div class="lg:col-span-2 space-y-4">
-
-            <div class="flex items-center justify-between">
-                <h2 class="text-white font-semibold text-lg">Active Incidents</h2>
-            </div>
-
-            @if (!Model.ActiveIncidents.Any())
-            {
-                <div class="rounded-2xl border border-white/10 bg-white/5 p-6 text-gray-400">
-                    No active incidents found.
+    <div class="grid grid-cols-12 gap-8 items-start">
+        
+        <div class="col-span-12 lg:col-span-8 space-y-8">
+            
+            <div class="group relative rounded-2xl border border-slate-900 bg-slate-900/20 p-2 transition-all duration-500 hover:border-slate-800">
+                <div class="absolute top-4 left-4 z-10 bg-slate-950/80 backdrop-blur-md border border-slate-800/80 px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-wider text-slate-300 uppercase">
+                    Geospatial Telemetry Canvas
                 </div>
-            }
+                <div id="map" class="rounded-xl h-[400px] w-full border border-slate-950 overflow-hidden shadow-2xl"></div>
+            </div>
 
-            @foreach (var item in Model.ActiveIncidents)
-            {
-                <div class="rounded-2xl border border-white/10 bg-white/5 p-5 hover:bg-white/10 transition">
-
-                    <div class="flex items-start justify-between">
-
-                        <div>
-                            <div class="text-white font-medium">
-                                @item.Title
-                            </div>
-
-                            <div class="text-sm text-gray-400 mt-1">
-                                @item.Location
-                            </div>
-                        </div>
-
-                        <div class="flex flex-col gap-2 items-end">
-
-                            <span class="text-xs px-2 py-1 rounded-md border
-                                @(item.Severity.ToString() == "Critical"
-                                                                      ? "bg-red-500/10 text-red-300 border-red-500/20"
-                                                                      : "bg-amber-500/10 text-amber-300 border-amber-500/20")">
-                                @item.Severity
-                            </span>
-
-                            <span class="text-xs px-2 py-1 rounded-md bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
-                                @item.Status
-                            </span>
-
-                        </div>
-
+            <div class="space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-900 pb-2">
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                        <span class="h-1 w-3 bg-red-500 rounded-full"></span> Queue Management
+                    </h2>
+                    <div class="flex gap-2">
+                        <a asp-controller="Incidents" asp-action="Create" class="text-xs text-slate-400 hover:text-white transition bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg">
+                            + File Incident
+                        </a>
+                        <a asp-controller="Dispatch" asp-action="Create" class="text-xs text-white bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 transition px-3 py-1.5 rounded-lg font-medium">
+                            ⚡ Quick Dispatch
+                        </a>
                     </div>
                 </div>
-            }
 
+                @if (!Model.ActiveIncidents.Any())
+                {
+                    <div class="rounded-2xl border border-dashed border-slate-900 bg-slate-950/40 p-12 text-center text-sm text-slate-600 font-mono">
+                        NO ACTIVE EMERGENCY REQUISITIONS IN CURRENT QUEUE
+                    </div>
+                }
+
+                <div class="space-y-3">
+                    @foreach (var item in Model.ActiveIncidents)
+                    {
+                        <div class="group relative rounded-xl border border-slate-900 bg-slate-900/10 p-5 hover:bg-slate-900/30 hover:border-slate-700/60 transition-all duration-300 cursor-pointer">
+                            
+                            <div class="absolute left-0 top-0 bottom-0 w-[1px] bg-red-500 scale-y-0 group-hover:scale-y-100 transition-transform duration-300 origin-center rounded-l"></div>
+
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div class="space-y-1">
+                                    <div class="text-xs text-slate-500 font-mono tracking-wide">INC-@item.Severity.ToString().ToUpper()</div>
+                                    <h3 class="text-white font-semibold text-base group-hover:text-red-400 transition-colors duration-200">
+                                        @item.Title
+                                    </h3>
+                                    <p class="text-xs text-slate-400 flex items-center gap-1">
+                                        <span class="text-slate-600">LOC //</span> @item.Location
+                                    </p>
+                                </div>
+
+                                <div class="flex sm:flex-col items-end gap-2 shrink-0">
+                                    <span class="text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded border
+                                        @(item.Severity.ToString() == "Critical"
+                                                                                      ? "bg-red-500/10 text-red-400 border-red-500/20"
+                                                                                      : "bg-amber-500/10 text-amber-400 border-amber-500/20")">
+                                        @item.Severity
+                                    </span>
+                                    <span class="text-[9px] font-mono uppercase px-2 py-1 rounded bg-slate-950 text-slate-400 border border-slate-900">
+                                        @item.Status
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
         </div>
 
-        <!-- RIGHT SIDE -->
-        <div class="space-y-6">
-
-            <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
-
-                <div class="text-white font-semibold mb-4">
-                    Live Incident Map
+        <div class="col-span-12 lg:col-span-4 space-y-6">
+            
+            <div class="rounded-2xl border border-slate-900 bg-slate-900/20 p-6 divide-y divide-slate-900">
+                <div class="pb-4">
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Active Incidents</div>
+                    <div class="text-4xl font-extrabold tracking-tight text-white mt-1 font-mono">@Model.ActiveIncidents.Count</div>
                 </div>
-
-                <div id="map" class="rounded-xl h-72 w-full"></div>
-
+                <div class="py-4">
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Available Fleet</div>
+                    <div class="text-4xl font-extrabold tracking-tight text-emerald-400 mt-1 font-mono">@Model.AvailableResources.Count</div>
+                </div>
+                <div class="pt-4">
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Critical Alerts</div>
+                    <div class="text-4xl font-extrabold tracking-tight text-red-500 mt-1 font-mono">@Model.ActiveIncidents.Count(i => i.Severity.ToString() == "Critical")</div>
+                </div>
             </div>
 
-            <!-- FLEET -->
-            <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
-
-                <div class="text-white font-semibold mb-4">
-                    Fleet Status
-                </div>
-
-                <div class="space-y-3">
-
+            <div class="rounded-2xl border border-slate-900 bg-slate-900/20 p-5 space-y-4">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-900 pb-2 flex items-center justify-between">
+                    <span>Fleet Status</span>
+                    <span class="font-mono text-[10px] text-slate-600">@Model.AvailableResources.Count REGISTRY</span>
+                </h2>
+                
+                <div class="space-y-2 max-h-56 overflow-y-auto pr-1 custom-scrollbar">
                     @foreach (var res in Model.AvailableResources)
                     {
-                        <div class="flex justify-between items-center p-3 rounded-xl bg-black/20 border border-white/10">
-
+                        <div class="flex justify-between items-center p-3 rounded-xl bg-slate-950/40 border border-slate-900/60 hover:border-slate-800 transition duration-200 group">
                             <div>
-                                <div class="text-white text-sm">@res.Name</div>
-                                <div class="text-xs text-gray-500 uppercase">@res.Type</div>
+                                <div class="text-white text-sm font-medium group-hover:text-emerald-400 transition-colors">@res.Name</div>
+                                <div class="text-[9px] text-slate-500 font-mono uppercase tracking-wider mt-0.5">@res.Type</div>
                             </div>
-
-                            <span class="text-xs px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
-                                Available
+                            <span class="text-[9px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded bg-emerald-950/60 text-emerald-400 border border-emerald-900/30">
+                                Standby
                             </span>
-
                         </div>
                     }
-
                 </div>
             </div>
 
-            <!-- ACTIVITY -->
-            <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
-
-                <div class="text-white font-semibold mb-4">
-                    Recent Activity
-                </div>
-
+            <div class="rounded-2xl border border-slate-900 bg-slate-900/20 p-5 space-y-4">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-900 pb-2">
+                    Transmission History
+                </h2>
                 <div class="space-y-3">
-
                     @foreach (var log in Model.RecentAssignments)
                     {
-                        <div class="p-3 rounded-xl bg-black/20 border border-white/10">
-
-                            <div class="text-xs text-gray-400 flex justify-between">
-                                <span>Dispatch</span>
+                        <div class="text-xs bg-slate-950/20 border border-slate-900/40 p-3 rounded-lg relative overflow-hidden">
+                            <div class="text-[9px] font-semibold text-slate-500 flex justify-between tracking-wider font-mono">
+                                <span>SYSTEM_NET_LOG</span>
                                 <span>@log.AssignedAt.ToShortTimeString()</span>
                             </div>
-
-                            <div class="text-sm text-gray-300 mt-1">
-                                <span class="text-emerald-300">@log.Resource?.Name</span>
-                                → @log.Incident?.Title
+                            <div class="text-slate-300 mt-1 font-medium leading-relaxed">
+                                Unit <span class="text-cyan-400 font-mono">@log.Resource?.Name</span> mapped to task <span class="text-white font-semibold">@log.Incident?.Title</span>
                             </div>
-
                         </div>
                     }
-
                 </div>
             </div>
 
@@ -213,23 +158,36 @@
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
 
-    <!-- Leaflet -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
     <script>
         // ======================
-        // MAP INIT
+        // ATLAS CANVASES: MINIMALIST MAP INITIALIZATION
         // ======================
-        var map = L.map('map').setView([35.7, -91.5], 10);
+        var map = L.map('map', {
+        zoomControl: false,
+        attributionControl: false
+        }).setView([35.0074, -92.3677], 9);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
+        // Smooth Dark Map Tile Layers
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 20
         }).addTo(map);
 
-        // ======================
-        // INCIDENT MARKERS
-        // ======================
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        // Custom Minimal HTML Ping Marker Structure
+        var customIncidentIcon = L.divIcon({
+        className: 'custom-map-marker',
+        html: `
+        <div class="relative flex h-4 w-4 items-center justify-center">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500/60 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500 border border-white/40"></span>
+        </div>
+        `,
+        iconSize: [16, 16],
+        iconAnchor: [8, 8]
+        });
+
+        // DYNAMIC INCIDENT PLOTTING
         @if (Model.ActiveIncidents != null)
         {
             foreach (var item in Model.ActiveIncidents)
@@ -237,24 +195,27 @@
                 if (item.Latitude != null && item.Longitude != null)
                 {
                     <text>
-                        L.marker([@item.Latitude, @item.Longitude])
+                        L.marker([@item.Latitude, @item.Longitude], { icon: customIncidentIcon })
                         .addTo(map)
-                        .bindPopup("@item.Title");
+                        .bindPopup(`<div class="p-1"><strong class="text-slate-900 block font-bold">@item.Title</strong><span class="text-slate-500 text-xs font-medium">@item.Location</span></div>`);
                     </text>
                 }
             }
         }
 
-        // ======================
-        // SIGNALR
-        // ======================
+        // SIGNALR LIVE REFRESH DATA PIPELINE
         const connection = new signalR.HubConnectionBuilder()
         .withUrl("/dispatchHub")
         .build();
 
         connection.on("UpdateDashboard", function () {
-        document.getElementById("sync-time").innerText = "Updating...";
+        const syncEl = document.getElementById("sync-time");
+        syncEl.innerText = "OVERWRITING ENGINE RECOGNITION...";
+        syncEl.classList.add("animate-pulse", "text-red-500");
+            
+        setTimeout(() => {
         window.location.reload();
+        }, 550);
         });
 
         connection.start().catch(err => console.error(err.toString()));
