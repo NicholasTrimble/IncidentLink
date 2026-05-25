@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using IncidentLink.Data;
 using IncidentLink.Models;
 using IncidentLink.Services;
+using IncidentLink.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace IncidentLink.Controllers
 {
@@ -15,11 +17,14 @@ namespace IncidentLink.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly GeocodingService _geo;
+        private readonly IHubContext<DispatchHub> _hubContext; // Added for live UI updates
 
-        public IncidentsController(ApplicationDbContext context, GeocodingService geo)
+        // FIXED: Injecting Hub Context here
+        public IncidentsController(ApplicationDbContext context, GeocodingService geo, IHubContext<DispatchHub> hubContext)
         {
             _context = context;
             _geo = geo;
+            _hubContext = hubContext;
         }
 
         // GET: Incidents
@@ -57,15 +62,12 @@ namespace IncidentLink.Controllers
         }
 
         // POST: Incidents/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title,Description,Severity,Status,Location,CreatedAt,ResolvedAt")] Incident incident)
         {
             if (ModelState.IsValid)
             {
-                // 🌍 Convert address -> coordinates
                 var coords = await _geo.GeocodeAsync(incident.Location);
 
                 if (coords != null)
@@ -76,6 +78,9 @@ namespace IncidentLink.Controllers
 
                 _context.Add(incident);
                 await _context.SaveChangesAsync();
+
+                // Live update the dashboard map/counters
+                await _hubContext.Clients.All.SendAsync("UpdateDashboard");
 
                 return RedirectToAction(nameof(Index));
             }
@@ -100,8 +105,6 @@ namespace IncidentLink.Controllers
         }
 
         // POST: Incidents/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,Severity,Status,Location,CreatedAt,ResolvedAt")] Incident incident)
@@ -116,7 +119,33 @@ namespace IncidentLink.Controllers
                 try
                 {
                     _context.Update(incident);
+
+                    // ⚡ FIXED: TRUCK AUTO-RECOVERY LOGIC ON RESOLUTION
+                    if (incident.Status == IncidentStatus.Resolved)
+                    {
+                        // Set resolution time stamp
+                        incident.ResolvedAt = DateTime.Now;
+
+                        // Find any vehicles assigned to this specific incident
+                        var activeAssignments = await _context.AssignmentLogs
+                            .Include(l => l.Resource)
+                            .Where(l => l.IncidentId == id)
+                            .ToListAsync();
+
+                        foreach (var log in activeAssignments)
+                        {
+                            if (log.Resource != null)
+                            {
+                                // Return the truck back to base
+                                log.Resource.Status = ResourceStatus.Available;
+                            }
+                        }
+                    }
+
                     await _context.SaveChangesAsync();
+
+                    // Signal UI components to update instantly
+                    await _hubContext.Clients.All.SendAsync("UpdateDashboard");
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -160,10 +189,28 @@ namespace IncidentLink.Controllers
             var incident = await _context.Incidents.FindAsync(id);
             if (incident != null)
             {
+               
+                // If an operator obliterates an active incident, make sure the unit doesn't stay locked down forever
+                var activeAssignments = await _context.AssignmentLogs
+                    .Include(l => l.Resource)
+                    .Where(l => l.IncidentId == id)
+                    .ToListAsync();
+
+                foreach (var log in activeAssignments)
+                {
+                    if (log.Resource != null)
+                    {
+                        log.Resource.Status = ResourceStatus.Available;
+                    }
+                }
+
                 _context.Incidents.Remove(incident);
             }
 
             await _context.SaveChangesAsync();
+
+            await _hubContext.Clients.All.SendAsync("UpdateDashboard");
+
             return RedirectToAction(nameof(Index));
         }
 
