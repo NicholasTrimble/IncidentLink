@@ -11,6 +11,16 @@ RUN dotnet restore *.csproj
 # 2. Copy the rest of your source code
 COPY . .
 
+# === SAFE TAILWIND INJECTION FOR RENDER ===
+# Install Node.js inside the build container so it can process Tailwind utilities
+RUN apt-get update && apt-get install -y curl
+RUN curl -sL https://deb.nodesource.com/setup_20.x | bash -
+RUN apt-get install -y nodejs
+
+# Run the Tailwind compiler to generate the production output.css
+RUN npx tailwindcss -i ./wwwroot/css/input.css -o ./wwwroot/css/output.css --minify
+# ==========================================
+
 # 3. Publish a compiled, optimized release of the app
 RUN dotnet publish -c Release -o out
 
@@ -21,6 +31,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
 
 # Copy the compiled output from Stage 1 into this clean container
+# (This automatically grabs the fresh output.css generated above)
 COPY --from=build-env /app/out .
 
 # Tell .NET to listen on the specific port Render uses
