@@ -1,40 +1,35 @@
 ﻿@{
-    ViewData["Title"] = "Emergency Assignment Control";
+    ViewData["Title"] = "Dispatch Control";
 }
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-dark text-white py-3">
-                    <h5 class="mb-0 fw-bold">Emergency Operations Dispatch Console</h5>
-                </div>
-                <div class="card-body p-4">
-                    <form asp-action="Create" method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+<div class="max-w-xl mx-auto space-y-6">
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small text-secondary">SELECT ACTIVE INCIDENT</label>
-                            <select name="incidentId" class="form-select border-2" asp-items="ViewBag.IncidentId">
-                                <option value="">-- Choose Emergency Event --</option>
-                            </select>
-                        </div>
+    <h1 class="text-2xl font-bold">Dispatch Control</h1>
 
-                        <div class="mb-4">
-                            <label class="form-label fw-bold small text-secondary">ASSIGN FIELD RESOURCE</label>
-                            <select name="resourceId" class="form-select border-2" asp-items="ViewBag.ResourceId">
-                                <option value="">-- Choose Available Unit --</option>
-                            </select>
-                        </div>
+    <form asp-action="Create"
+          class="space-y-4 bg-gray-900 border border-gray-800 p-6 rounded-xl">
 
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-danger btn-lg fw-bold tracking-wide shadow-sm">
-                                AUTHORIZE DISPATCH COMMAND
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+        <div>
+            <label class="text-sm text-gray-400">Incident</label>
+            <select name="incidentId"
+                    asp-items="ViewBag.IncidentId"
+                    class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2">
+                <option value="">Select Incident</option>
+            </select>
         </div>
-    </div>
+
+        <div>
+            <label class="text-sm text-gray-400">Resource</label>
+            <select name="resourceId"
+                    asp-items="ViewBag.ResourceId"
+                    class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2">
+                <option value="">Select Unit</option>
+            </select>
+        </div>
+
+        <button class="w-full px-4 py-3 bg-red-600 hover:bg-red-700 rounded-lg text-white font-bold">
+            Dispatch Unit
+        </button>
+
+    </form>
 </div>

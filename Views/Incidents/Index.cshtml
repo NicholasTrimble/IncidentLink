@@ -1,71 +1,79 @@
 ﻿@model IEnumerable<IncidentLink.Models.Incident>
-
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Incidents";
 }
 
-<h1>Index</h1>
+<div class="space-y-6">
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Severity)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Location)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ResolvedAt)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Severity)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Location)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ResolvedAt)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+
+    <div class="mb-6 rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+        <div id="map" class="w-full h-[400px]"></div>
+    </div>
+
+    <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-bold">Incidents</h1>
+
+        <a asp-action="Create"
+               class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white text-sm">
+            + New Incident
+        </a>
+    </div>
+
+    <div class="overflow-x-auto bg-gray-900 border border-gray-800 rounded-xl">
+        <table class="w-full text-sm text-left">
+            <thead class="text-gray-400 border-b border-gray-800">
+                <tr>
+                    <th class="p-3">Title</th>
+                    <th class="p-3">Severity</th>
+                    <th class="p-3">Status</th>
+                    <th class="p-3">Location</th>
+                    <th class="p-3">Created</th>
+                    <th class="p-3 text-right">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody class="divide-y divide-gray-800">
+                @foreach (var item in Model)
+                {
+                    <tr class="hover:bg-gray-800/40">
+                        <td class="p-3 font-medium text-white">@item.Title</td>
+                        <td class="p-3 text-gray-300">@item.Severity</td>
+                        <td class="p-3 text-gray-300">@item.Status</td>
+                        <td class="p-3 text-gray-300">@item.Location</td>
+                        <td class="p-3 text-gray-400">@item.CreatedAt</td>
+                        <td class="p-3 text-right space-x-2">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="text-blue-400 hover:underline">Edit</a>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="text-green-400 hover:underline">View</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="text-red-400 hover:underline">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <script>
+        var map = L.map('map').setView([35.7, -91.5], 10);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        @foreach (var item in Model)
+        {
+            if (item.Latitude != null && item.Longitude != null)
+            {
+                <text>
+                    L.marker([@item.Latitude, @item.Longitude])
+                    .addTo(map)
+                    .bindPopup("@item.Title");
+                </text>
+            }
+        }
+    </script>
 }
-    </tbody>
-</table>

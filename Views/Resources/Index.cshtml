@@ -1,59 +1,50 @@
 ﻿@model IEnumerable<IncidentLink.Models.Resource>
-
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Resources";
 }
 
-<h1>Index</h1>
+<div class="space-y-6">
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Type)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CurrentLocation)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Capacity)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Type)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CurrentLocation)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Capacity)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-bold">Resources</h1>
+
+        <a asp-action="Create"
+               class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white text-sm">
+            + Add Resource
+        </a>
+    </div>
+
+    <div class="overflow-x-auto bg-gray-900 border border-gray-800 rounded-xl">
+        <table class="w-full text-sm text-left">
+            <thead class="text-gray-400 border-b border-gray-800">
+                <tr>
+                    <th class="p-3">Name</th>
+                    <th class="p-3">Type</th>
+                    <th class="p-3">Status</th>
+                    <th class="p-3">Location</th>
+                    <th class="p-3">Capacity</th>
+                    <th class="p-3 text-right">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody class="divide-y divide-gray-800">
+                @foreach (var item in Model)
+                {
+                    <tr class="hover:bg-gray-800/40">
+                        <td class="p-3 font-medium text-white">@item.Name</td>
+                        <td class="p-3 text-gray-300">@item.Type</td>
+                        <td class="p-3 text-gray-300">@item.Status</td>
+                        <td class="p-3 text-gray-300">@item.CurrentLocation</td>
+                        <td class="p-3 text-gray-300">@item.Capacity</td>
+                        <td class="p-3 text-right space-x-2">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="text-blue-400 hover:underline">Edit</a>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="text-green-400 hover:underline">View</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="text-red-400 hover:underline">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>

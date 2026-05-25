@@ -16,8 +16,7 @@ namespace IncidentLink.Models
         public string Description { get; set; } = string.Empty;
 
         [Required]
-        [StringLength(50)]
-        public string Severity { get; set; } = "Medium";
+        public IncidentSeverity Severity { get; set; } = IncidentSeverity.Medium;
 
         public IncidentStatus Status { get; set; } = IncidentStatus.Reported;
 
@@ -27,5 +26,9 @@ namespace IncidentLink.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? ResolvedAt { get; set; }
+
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
+        
     }
 }

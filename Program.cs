@@ -16,6 +16,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<IDispatchService, DispatchService>();
 
+builder.Services.AddHttpClient<IncidentLink.Services.GeocodingService>();
+
 builder.Services.AddSignalR();
 
 var app = builder.Build();

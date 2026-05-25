@@ -1,0 +1,27 @@
+﻿@import "tailwindcss";
+@import "flowbite";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        @apply bg-slate-950 text-slate-100;
+    }
+}
+
+@layer components {
+
+    .panel {
+        @apply bg-white/5 border border-white/5 rounded-2xl;
+    }
+
+    .panel-header {
+        @apply px-4 py-3 border-b border-white/5 text-white font-medium;
+    }
+
+    .stat-card {
+        @apply bg-white/5 border border-white/5 rounded-xl p-4;
+    }
+}

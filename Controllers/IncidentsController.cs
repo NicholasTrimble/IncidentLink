@@ -7,22 +7,29 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using IncidentLink.Data;
 using IncidentLink.Models;
+using IncidentLink.Services;
 
 namespace IncidentLink.Controllers
 {
     public class IncidentsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly GeocodingService _geo;
 
-        public IncidentsController(ApplicationDbContext context)
+        public IncidentsController(ApplicationDbContext context, GeocodingService geo)
         {
             _context = context;
+            _geo = geo;
         }
 
         // GET: Incidents
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Incidents.ToListAsync());
+            var incidents = await _context.Incidents
+                .AsNoTracking()
+                .ToListAsync();
+
+            return View(incidents);
         }
 
         // GET: Incidents/Details/5
@@ -58,10 +65,21 @@ namespace IncidentLink.Controllers
         {
             if (ModelState.IsValid)
             {
+                // 🌍 Convert address -> coordinates
+                var coords = await _geo.GeocodeAsync(incident.Location);
+
+                if (coords != null)
+                {
+                    incident.Latitude = coords.Value.lat;
+                    incident.Longitude = coords.Value.lng;
+                }
+
                 _context.Add(incident);
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(incident);
         }
 

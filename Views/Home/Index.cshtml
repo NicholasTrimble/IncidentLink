@@ -3,152 +3,260 @@
     ViewData["Title"] = "Dashboard";
 }
 
-<div class="container-fluid px-4 mt-4">
-    <!-- Dashboard Header -->
-    <div class="row align-items-center mb-4 g-3">
-        <div class="col-md-6 text-start">
-            <h4 class="mb-1 fw-bold text-white tracking-tight">IncidentLink Dashboard</h4>
-            <div class="d-flex align-items-center gap-2 small text-muted">
-                <span class="pulse-indicator"></span>
-                <span>Live Sync Connected</span>
-                <span class="text-secondary">|</span>
-                <span id="sync-time">System Status: Ready</span>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="d-flex justify-content-md-end gap-3">
-                <div class="px-3 py-2 tac-card text-center min-w-120">
-                    <div class="text-uppercase font-monospace text-muted" style="font-size: 0.65rem;">Active Incidents</div>
-                    <span class="h4 fw-bold mb-0 text-warning">@Model.ActiveIncidents.Count</span>
+<div class="space-y-8">
+
+    <!-- ===================== -->
+    <!-- HERO STATUS BAR -->
+    <!-- ===================== -->
+    <div class="rounded-2xl border border-white/10 bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 p-6">
+
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+
+            <div>
+                <h1 class="text-2xl font-semibold text-white tracking-tight">
+                    Incident Command Dashboard
+                </h1>
+
+                <p class="text-sm text-gray-400 mt-2">
+                    Real-time monitoring & dispatch control system
+                </p>
+
+                <div class="flex items-center gap-3 mt-3 text-xs text-gray-400">
+                    <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    System Online
+                    <span class="text-gray-600">•</span>
+                    Last sync: <span id="sync-time">live</span>
                 </div>
-                <div class="px-3 py-2 tac-card text-center min-w-120">
-                    <div class="text-uppercase font-monospace text-muted" style="font-size: 0.65rem;">Available Units</div>
-                    <span class="h4 fw-bold mb-0 text-success">@Model.AvailableResources.Count</span>
-                </div>
             </div>
+
+            <!-- QUICK ACTIONS -->
+            <div class="flex gap-3">
+                <a asp-controller="Dispatch" asp-action="Create"
+                       class="px-4 py-2 rounded-xl bg-red-500/10 text-red-300 border border-red-500/20 hover:bg-red-500/20 transition">
+                    Dispatch Unit
+                </a>
+
+                <a asp-controller="Incidents" asp-action="Create"
+                       class="px-4 py-2 rounded-xl bg-white/5 text-white border border-white/10 hover:bg-white/10 transition">
+                    New Incident
+                </a>
+            </div>
+
         </div>
     </div>
 
-    <!-- Main Workspace Grid -->
-    <div class="row g-4">
-        <!-- Active Incidents Table -->
-        <div class="col-lg-8">
-            <div class="card tac-card h-100">
-                <div class="tac-header d-flex justify-content-between align-items-center">
-                    <span>🚨 Active Incidents</span>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table tac-table align-middle">
-                            <thead>
-                                <tr>
-                                    <th>Emergency</th>
-                                    <th>Location</th>
-                                    <th>Severity</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (!Model.ActiveIncidents.Any())
-                                {
-                                    <tr>
-                                        <td colspan="4" class="text-center text-muted py-5 small">No active incidents found.</td>
-                                    </tr>
-                                }
-                                @foreach (var item in Model.ActiveIncidents)
-                                {
-                                    <tr>
-                                        <td><span class="fw-bold text-white">@item.Title</span></td>
-                                        <td><span class="text-secondary">@item.Location</span></td>
-                                        <td>
-                                            <span class="badge @(item.Severity.ToString() == "Critical" || item.Severity.ToString() == "High" ? "badge-neon-danger" : "badge-neon-warning")">
-                                                @item.Severity
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span class="badge rounded-pill text-uppercase @(item.Status.ToString() == "Assigned" ? "badge-neon-info" : "badge-neon-warning")">
-                                                @item.Status
-                                            </span>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+    <!-- ===================== -->
+    <!-- KPI CARDS -->
+    <!-- ===================== -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+        <div class="rounded-2xl bg-white/5 border border-white/10 p-5">
+            <div class="text-xs text-gray-400 uppercase">Active Incidents</div>
+            <div class="text-3xl font-semibold text-amber-300 mt-2">
+                @Model.ActiveIncidents.Count
             </div>
         </div>
 
-        <!-- Right Side Columns -->
-        <div class="col-lg-4">
-            <div class="row g-4">
-                <!-- Fleet Status Panel -->
-                <div class="col-12">
-                    <div class="card tac-card">
-                        <div class="tac-header">🚒 Available Fleet Status</div>
-                        <div class="list-group list-group-flush" style="max-height: 280px; overflow-y: auto;">
-                            @if (!Model.AvailableResources.Any())
-                            {
-                                <div class="p-4 text-center text-muted small">All units are currently dispatched.</div>
-                            }
-                            @foreach (var res in Model.AvailableResources)
-                            {
-                                <div class="list-group-item bg-transparent d-flex justify-content-between align-items-center py-3 border-secondary border-opacity-10">
-                                    <div>
-                                        <div class="fw-bold text-white mb-0" style="font-size: 0.9rem;">@res.Name</div>
-                                        <small class="text-muted text-uppercase" style="font-size: 0.7rem;">@res.Type</small>
-                                    </div>
-                                    <span class="badge badge-neon-success small">Available</span>
-                                </div>
-                            }
+        <div class="rounded-2xl bg-white/5 border border-white/10 p-5">
+            <div class="text-xs text-gray-400 uppercase">Available Units</div>
+            <div class="text-3xl font-semibold text-emerald-300 mt-2">
+                @Model.AvailableResources.Count
+            </div>
+        </div>
+
+        <div class="rounded-2xl bg-white/5 border border-white/10 p-5">
+            <div class="text-xs text-gray-400 uppercase">Critical Alerts</div>
+            <div class="text-3xl font-semibold text-red-300 mt-2">
+                @Model.ActiveIncidents.Count(i => i.Severity.ToString() == "Critical")
+            </div>
+        </div>
+
+        <div class="rounded-2xl bg-white/5 border border-white/10 p-5">
+            <div class="text-xs text-gray-400 uppercase">System Status</div>
+            <div class="text-lg font-semibold text-cyan-300 mt-2">
+                Operational
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===================== -->
+    <!-- MAIN GRID -->
+    <!-- ===================== -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- LEFT: INCIDENTS (CARD FEED INSTEAD OF TABLE) -->
+        <div class="lg:col-span-2 space-y-4">
+
+            <div class="flex items-center justify-between">
+                <h2 class="text-white font-semibold text-lg">Active Incidents</h2>
+            </div>
+
+            @if (!Model.ActiveIncidents.Any())
+            {
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-6 text-gray-400">
+                    No active incidents found.
+                </div>
+            }
+
+            @foreach (var item in Model.ActiveIncidents)
+            {
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-5 hover:bg-white/10 transition">
+
+                    <div class="flex items-start justify-between">
+
+                        <div>
+                            <div class="text-white font-medium">
+                                @item.Title
+                            </div>
+
+                            <div class="text-sm text-gray-400 mt-1">
+                                @item.Location
+                            </div>
                         </div>
+
+                        <div class="flex flex-col gap-2 items-end">
+
+                            <span class="text-xs px-2 py-1 rounded-md border
+                                @(item.Severity.ToString() == "Critical"
+                                                                      ? "bg-red-500/10 text-red-300 border-red-500/20"
+                                                                      : "bg-amber-500/10 text-amber-300 border-amber-500/20")">
+                                @item.Severity
+                            </span>
+
+                            <span class="text-xs px-2 py-1 rounded-md bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
+                                @item.Status
+                            </span>
+
+                        </div>
+
                     </div>
+                </div>
+            }
+
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="space-y-6">
+
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+
+                <div class="text-white font-semibold mb-4">
+                    Live Incident Map
                 </div>
 
-                <!-- Recent Dispatch Logs Panel -->
-                <div class="col-12">
-                    <div class="card tac-card">
-                        <div class="tac-header">📋 Recent Activity Log</div>
-                        <div class="list-group list-group-flush" style="font-size: 0.85rem;">
-                            @if (!Model.RecentAssignments.Any())
-                            {
-                                <div class="p-4 text-center text-muted small">No recent dispatch activity recorded.</div>
-                            }
-                            @foreach (var log in Model.RecentAssignments)
-                            {
-                                <div class="list-group-item bg-transparent py-3 border-secondary border-opacity-10">
-                                    <div class="d-flex justify-content-between text-muted mb-1" style="font-size: 0.75rem;">
-                                        <span class="text-info">Dispatch Action</span>
-                                        <span>@log.AssignedAt.ToShortTimeString()</span>
-                                    </div>
-                                    <div class="text-white-50">
-                                        Unit <span class="text-success fw-bold">@log.Resource?.Name</span> was dispatched to <span class="text-warning">@log.Incident?.Title</span>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    </div>
-                </div>
+                <div id="map" class="rounded-xl h-72 w-full"></div>
 
             </div>
+
+            <!-- FLEET -->
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+
+                <div class="text-white font-semibold mb-4">
+                    Fleet Status
+                </div>
+
+                <div class="space-y-3">
+
+                    @foreach (var res in Model.AvailableResources)
+                    {
+                        <div class="flex justify-between items-center p-3 rounded-xl bg-black/20 border border-white/10">
+
+                            <div>
+                                <div class="text-white text-sm">@res.Name</div>
+                                <div class="text-xs text-gray-500 uppercase">@res.Type</div>
+                            </div>
+
+                            <span class="text-xs px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                                Available
+                            </span>
+
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+            <!-- ACTIVITY -->
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+
+                <div class="text-white font-semibold mb-4">
+                    Recent Activity
+                </div>
+
+                <div class="space-y-3">
+
+                    @foreach (var log in Model.RecentAssignments)
+                    {
+                        <div class="p-3 rounded-xl bg-black/20 border border-white/10">
+
+                            <div class="text-xs text-gray-400 flex justify-between">
+                                <span>Dispatch</span>
+                                <span>@log.AssignedAt.ToShortTimeString()</span>
+                            </div>
+
+                            <div class="text-sm text-gray-300 mt-1">
+                                <span class="text-emerald-300">@log.Resource?.Name</span>
+                                → @log.Incident?.Title
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
 
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
     <script>
+        // ======================
+        // MAP INIT
+        // ======================
+        var map = L.map('map').setView([35.7, -91.5], 10);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // ======================
+        // INCIDENT MARKERS
+        // ======================
+        @if (Model.ActiveIncidents != null)
+        {
+            foreach (var item in Model.ActiveIncidents)
+            {
+                if (item.Latitude != null && item.Longitude != null)
+                {
+                    <text>
+                        L.marker([@item.Latitude, @item.Longitude])
+                        .addTo(map)
+                        .bindPopup("@item.Title");
+                    </text>
+                }
+            }
+        }
+
+        // ======================
+        // SIGNALR
+        // ======================
         const connection = new signalR.HubConnectionBuilder()
         .withUrl("/dispatchHub")
         .build();
 
         connection.on("UpdateDashboard", function () {
-        document.getElementById("sync-time").innerText = "Updating dashboard data...";
+        document.getElementById("sync-time").innerText = "Updating...";
         window.location.reload();
         });
 
-        connection.start().catch(function (err) {
-        console.error(err.toString());
-        });
+        connection.start().catch(err => console.error(err.toString()));
     </script>
 }
