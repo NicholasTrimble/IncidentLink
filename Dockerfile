@@ -17,11 +17,11 @@ RUN apt-get update && apt-get install -y curl
 RUN curl -sL https://deb.nodesource.com/setup_20.x | bash -
 RUN apt-get install -y nodejs
 
-# Install tailwindcss globally
-RUN npm install -g tailwindcss
+# FIXED: Install tailwindcss locally in this folder instead of globally
+RUN npm install tailwindcss
 
-# FIXED: Explicitly call the absolute path where npm links global binaries on Ubuntu
-RUN /usr/local/bin/tailwindcss -i ./wwwroot/css/input.css -o ./wwwroot/css/output.css --minify
+# FIXED: Execute the guaranteed local binary file pathway
+RUN ./node_modules/.bin/tailwindcss -i ./wwwroot/css/input.css -o ./wwwroot/css/output.css --minify
 # ==========================================
 
 # 3. Publish a compiled, optimized release of the app
